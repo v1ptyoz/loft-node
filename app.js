@@ -1,11 +1,11 @@
 const fs = require('fs');
+const path = require('path');
 
 function main(sourceDir, destinationDir) {
   if (!sourceDir && !destinationDir) {
     console.log("Missing require parameters\nUsage: app.js sourceDirName destinationDirname ...");
     return;
   }
-  let counter = 0;
 
   function createDirAndCallCallback(dir, callback) {
     fs.stat(dir, (err) => {
@@ -23,10 +23,9 @@ function main(sourceDir, destinationDir) {
     fs.readdir(source, { withFileTypes: true }, (err, files) => {
       files.forEach(file => {
         if (file.isDirectory()) {
-          readDirectory(`${source}/${file.name}`);
+          readDirectory(path.join(source, file.name));
         } else {
           fileCopy(source, file.name);
-          counter++;
         }
       });
     })
@@ -34,16 +33,16 @@ function main(sourceDir, destinationDir) {
 
   function fileCopy(source, filename) {
     const firstLetterOfFile = filename[0].toUpperCase();
-    const finalDestination = `${destinationDir}/${firstLetterOfFile}`;
+    const finalDestination = path.join(__dirname, destinationDir, firstLetterOfFile);
     createDirAndCallCallback(finalDestination, () => {
-      fs.copyFile(`${source}/${filename}`, `${finalDestination}/${filename}`, (err) => {
+      fs.copyFile(path.join(source, filename), path.join(finalDestination, filename), (err) => {
         if (err) throw err;
       })
     });
   }
 
   createDirAndCallCallback(destinationDir);
-  readDirectory(sourceDir);
+  readDirectory(path.join(__dirname, sourceDir));
 
   fs.rm(sourceDir, { recursive: true, force: true }, (err) => {
     if (err) throw err;
