@@ -4,8 +4,9 @@ const INTERVAL = process.env.interval || 1000;
 const TIME = process.env.time || 3000;
 
 const server = http.createServer((req, res) => {
-  if (req.url === "/") {
+  if (req.method === "GET") {
     let interval;
+
     const startTime = Date.now();
     let endTime = Date.now();
 
