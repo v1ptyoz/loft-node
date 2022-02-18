@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-async function main(sourceDir, destinationDir) {  
+async function main(sourceDir, destinationDir) {
   if (!sourceDir && !destinationDir) {
     console.log("Missing require parameters\nUsage: app.js sourceDirName destinationDirname ...");
     return;
@@ -9,7 +9,7 @@ async function main(sourceDir, destinationDir) {
 
   function createDir(dir) {
     return new Promise((resolve) => {
-      const item = fs.statSync(dir, {throwIfNoEntry: false});
+      const item = fs.statSync(dir, { throwIfNoEntry: false });
       if (!item) {
         resolve(fs.mkdirSync(dir));
       } else {
@@ -20,20 +20,23 @@ async function main(sourceDir, destinationDir) {
 
   function readDir(dir) {
     return new Promise((resolve) => {
-      const files = fs.readdirSync(dir, {withFileTypes: true});
+      const files = fs.readdirSync(dir, { withFileTypes: true });
       resolve(files);
     })
   }
 
   async function processFiles(source) {
-    const files = await readDir(source);
-    files.forEach(async (file) => {
-      if (file.isDirectory()) {
-        await processFiles(path.join(source, file.name));
-      } else {
-        await fileCopy(source, file.name);
-      }
-    });
+    return new Promise(async (resolve) => {
+      const files = await readDir(source);
+      files.forEach(async (file) => {
+        if (file.isDirectory()) {
+          await processFiles(path.join(source, file.name));
+        } else {
+          await fileCopy(source, file.name);
+        }
+      });
+      resolve("All files are sorted. Check it ^_^");
+    })
   }
 
   async function fileCopy(source, filename) {
@@ -48,8 +51,7 @@ async function main(sourceDir, destinationDir) {
   }
 
   await createDir(destinationDir);
-  await processFiles(path.join(__dirname, sourceDir));
-
+  console.log(await processFiles(path.join(__dirname, sourceDir)));
 }
 
 main(process.argv[2], process.argv[3]);
