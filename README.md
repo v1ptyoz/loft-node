@@ -1,8 +1,7 @@
 # File sorter
 
-Moving all files in source directory to destination directory. In destination directory created other directories by first letter of filename, that store files
+Simple HTTP server.
+On all GET requests server is responding current date in browser after _env.time_ ms.
+Also, server is logging to console current date every _env.interval_ ms.
 
-## ATTENTION: SOURCE DIRECTORY WILL BE DELETED
-
-
-### Usage: `app.js source destination`
+### Usage: `node app.js`
