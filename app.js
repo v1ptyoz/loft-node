@@ -1,7 +1,7 @@
 const http = require('http');
 const PORT = 3000;
-const INTERVAL = 1000;
-const MAX = 5;
+const INTERVAL = process.env.interval || 1000;
+const TIME = process.env.time || 3000;
 
 const server = http.createServer((req, res) => {
   if (req.url === "/") {
