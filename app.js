@@ -7,27 +7,34 @@ async function main(sourceDir, destinationDir) {
     return;
   }
 
-  function createDir(dir) {
+  async function createDir(dir) {
     return new Promise((resolve) => {
-      const item = fs.statSync(dir, { throwIfNoEntry: false });
-      if (!item) {
-        resolve(fs.mkdirSync(dir));
-      } else {
-        resolve(false);
-      }
+      fs.stat(dir, { throwIfNoEntry: false }, (err) => {
+        if (err) {
+          resolve(fs.mkdir(dir, () => {}));
+        } else {
+          resolve();
+        }
+      });
     })
   }
 
-  function readDir(dir) {
-    return new Promise((resolve) => {
-      const files = fs.readdirSync(dir, { withFileTypes: true });
-      resolve(files);
+  async function readDir(dir) {
+    return new Promise((resolve, reject) => {
+      fs.readdir(dir, { withFileTypes: true }, (err, files) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(files);
+        }
+      });
     })
   }
 
   async function processFiles(source) {
     return new Promise(async (resolve) => {
       const files = await readDir(source);
+      console.log(files);
       files.forEach(async (file) => {
         if (file.isDirectory()) {
           await processFiles(path.join(source, file.name));
@@ -45,8 +52,14 @@ async function main(sourceDir, destinationDir) {
 
     await createDir(finalDestination);
 
-    return new Promise((resolve) => {
-      resolve(fs.copyFileSync(path.join(source, filename), path.join(finalDestination, filename)));
+    return new Promise((resolve, reject) => {
+      fs.copyFile(path.join(source, filename), path.join(finalDestination, filename), (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
     })
   }
 
